@@ -1,0 +1,203 @@
+---
+title: "STAT 3675Q Homework 7"
+subtitle: "Due date: **Thursday, October 16, at noon**"
+output: pdf_document
+fontsize: 12pt
+urlcolor: blue
+Author: Zeshi Feng
+---
+
+```{r setup, include=FALSE}
+# Some global options
+knitr::opts_chunk$set(include = TRUE) # print out all code  
+knitr::opts_chunk$set(echo = TRUE) # print out all output
+```
+
+**Note:**
+
+- Ensure that your code is fully visible in the PDF and not cropped. If needed, break the code into multiple lines to fit.
+
+- It is recommended to write descriptive answers outside of R code chunks (i.e., as text in the main body), while comments within the code chunks can be reserved for brief code annotations.
+
+- In all homework questions, include a written explanation of any output to earn full credit.
+
+
+## Question 1 [30 points]
+
+Reconsider Question 1 in Homework 6.
+
+```{r}
+set.seed(1111)
+u <- runif(100)
+set.seed(1111)
+n <- rnorm(100, mean = 1, sd = 0.5)
+set.seed(1111)
+e <- rexp(100, rate=2)
+```
+
+f. For the three random vectors created in  parts b--d, can you get their corresponding sample means, medians and standard deviations simultaneously using `apply()`? Note that you should get the same results as in Question 1. Hint: First combine the three vectors into a data frame.
+
+**Answer:**
+```{r}
+u <- runif(100)
+n <- rnorm(100, mean = 1, sd = 0.5)
+e <- rexp(100, rate = 2)
+X <- data.frame(uniform = u, normal = n, exponential = e)
+
+means   <- apply(X, 2, mean)
+medians <- apply(X, 2, median)
+sds     <- apply(X, 2, sd)
+
+result <- rbind(mean = means, median = medians, sd = sds)
+result
+```
+
+g. For the three random vectors created in  parts b--d, get the results of `summary()` using `apply()`.
+
+**Answer:**
+```{r}
+result <- apply(X, 2, summary)
+result
+```
+
+h. For parts b--d, how do you think the differences between the theoretical and sample versions of the statistics will change if you increase the sample size? Verify this numerically using the distribution in part c by first creating the following list:
+
+```{r}
+set.seed(1234)
+list1 <- list(n1 = rnorm(50, mean = 1, sd = 0.5), 
+              n2 = rnorm(500, mean = 1, sd = 0.5), 
+              n3 = rnorm(10000, mean = 1, sd = 0.5))
+```
+
+Then use `lapply()` or `sapply()` to calculate the corresponding sample means, medians, and standard deviations. Compare the results to the theoretical mean, median, and standard deviation.
+
+**Answer:**
+```{r}
+theory <- c(mean = 1, median = 1, sd = 0.5)
+stats_mat <- sapply(list1, function(x) c(mean = mean(x), median = median(x), sd = sd(x)))
+diff_mat <- sweep(stats_mat, 1, theory, FUN = "-")
+abs_err   <- abs(diff_mat)
+
+result <- rbind(
+  `sample mean`   = stats_mat["mean", ],
+  `error mean-1`  = diff_mat["mean", ],
+  `sample median` = stats_mat["median", ],
+  `error med-1`   = diff_mat["median", ],
+  `sample sd`     = stats_mat["sd", ],
+  `error sd-0.5`  = diff_mat["sd", ]
+)
+result
+```
+
+## Question 2 [20 points]
+
+Reconsider the Forbes Global 2000 data.
+
+a.  Import the original data with 2000 observations. For the website addresses, replace "http://www.forbes.com/companies" with "~"  (hint: use the function `sub()`) and store the shortened website addresses in a new variable named **newWebsite**. Display the first 6 new addresses.
+
+**Answer:**
+```{r}
+forbes <- read.csv("Forbes Global 2000.csv")
+
+forbes$newWebsite <- sub(
+  "http://www.forbes.com/companies",
+  "~",
+  forbes$`Forbes.Webpage`
+)
+
+head(forbes$newWebsite)
+
+```
+
+b. Set the random seed to 1234. Randomly draw a sample of size 10 from the ForbesGlobal2000 data. Extract all columns with character data. Find the number of characters for each entry in all these columns using `apply()`.
+
+**Answer:**
+```{r}
+set.seed(1234)
+idx  <- sample(nrow(forbes), 10)
+samp <- forbes[idx, , drop = FALSE]
+is_charlike <- sapply(samp, function(x) is.character(x) || is.factor(x))
+char_df <- data.frame(lapply(samp[, is_charlike, drop = FALSE], as.character),
+                      check.names = FALSE, stringsAsFactors = FALSE)
+char_len <- apply(as.matrix(char_df), c(1, 2), nchar)
+char_len
+```
+
+## Question 3 [50 points]
+
+Reconsider Question 3 in Homework 6.
+
+```{r}
+txt <- readLines("shortstory.txt")
+txt <- paste(txt, collapse = "") # line 1
+txt <- tolower(txt) # line 2
+txt <- unlist(strsplit(txt,"")) # line 3
+```
+
+c. Note that R has a built-in vector called **letters** which contains all the letters from a-z (hint: try typing `letters` in the console). What is the goal of the following code?   
+
+```{r}
+counts <- rep(0,26)
+for (i in 1:length(letters)) {
+  counts[i] <- length(grep(letters[i], txt)) 
+}
+```
+
+**Answer:** 
+The goal of this code is to count how many times each letter (a–z) appears in the text.
+It creates a vector counts of length 26 and, for each letter in the built-in vector letters, uses grep() to find all occurrences of that letter in the text txt. The resulting counts vector therefore contains the frequency of each letter in the story.
+
+d. Briefly comment on what line 1 of the following code does and what you observe in the plot below.  
+
+```{r}
+probs <- counts/sum(counts) # line 1
+barplot(probs, ylim=c(0,0.14), space=0)
+title("Probabilities of letters\n\"A Perfect Day for Bananafish\"\nby J.D. Salinger")
+text(1:26-0.5,probs+0.003,letters, col=2)
+```
+
+**Answer:** 
+Line 1 converts the raw letter counts into probabilities by dividing each count by the total number of letters, producing the relative frequency of each letter in the text.
+The bar plot shows that common English letters such as e, t, a, o, and n appear most frequently, while q, x, and z are rare. This pattern matches general English letter frequency distributions.
+
+e.  In an alphabet consisting of $n$ characters, $x_1,\ldots,x_n$, whose probabilities of occurrence are $p_1, \ldots, p_n$, respectively, the Shannon entropy is defined as
+$$H = -\sum_{i=1}^n p_i\log_2 p_i.$$
+
+Entropy is a measure of unpredictability of information content - the greater the entropy, the less predictable the content.
+Write a function called `entropy` that computes the Shannon entropy given the probabilities. The input argument is a vector called `probs` whose $i$th element is the probability (i.e., relative frequency) that the $i$th letter occurs in the text.
+
+**Answer:** 
+```{r}
+entropy <- function(probs) {
+  probs <- probs[probs > 0]
+  H <- -sum(probs * log2(probs))
+  return(H)
+}
+```
+
+f. Calculate the Shannon entropy of the short story in this question. Hint: Use what you created in parts d and e.
+
+**Answer:** 
+```{r}
+H <- entropy(probs)
+H_max <- log2(26)   
+H_rel <- H / H_max 
+c(H = H, H_max = H_max, Relative_Entropy = H_rel)
+```
+
+
+g. Suppose that a text consists of 26 characters drawn **uniformly** from the English alphabet (a-z), i.e., the `probs` vector is `rep(1,26)/26`. 
+Calculate its Shannon entropy.  Comparing it to the result in part f, what can you say about the short story in this question? 
+
+**Note:** This question does not ask you to conduct the random sampling. Instead, you only need to apply the `entropy` function to the `probs` vector and interpret the results.
+
+**Answer:** 
+```{r}
+probs_uniform <- rep(1, 26) / 26
+H_uniform <- entropy(probs_uniform)
+H_uniform
+```
+"The Shannon entropy of a uniform distribution over 26 letters is 4.70 bits.
+In comparison, the short story’s entropy from part (f) is slightly lower.
+This means the story’s letter distribution is not perfectly uniform—some letters (like e, t, a, o) appear much more frequently than others (q, x, z).
+Therefore, the text of A Perfect Day for Bananafish contains less uncertainty and more structure than a completely random sequence of letters, which is characteristic of natural English language."

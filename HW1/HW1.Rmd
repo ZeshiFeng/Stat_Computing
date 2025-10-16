@@ -1,0 +1,102 @@
+---
+title: "STAT 3675Q Homework 1"
+subtitle: "Due date: **Thursday, September 4, at noon**"
+author: Zeshi Feng
+output: pdf_document
+fontsize: 12pt
+---
+
+```{r setup, include=FALSE}
+# Some global options
+knitr::opts_chunk$set(include = TRUE) # print out all code  
+knitr::opts_chunk$set(echo = TRUE) # print out all output
+```
+
+**Note:**
+
+-   Ensure that your code is fully visible in the PDF and not cropped. If needed, break the code into multiple lines to fit.
+
+-   It is recommended to write descriptive answers outside of R code chunks (i.e., as text in the main body), while comments within the code chunks can be reserved for brief code annotations.
+
+-   In all homework questions, include a written explanation of any output to earn full credit. For example, explain what the histograms show and how they relate to the data.
+
+## Question 1 [20 points]
+
+Install and load the R package `usdata`. Print the first six rows of the dataset `county_2019`.
+
+Note: Install R packages in the Console using `install.packages("")` - this command cannot be run in the code chunks in an Rmd file. You only need to install a package once. However, you must load the package with the `library()` command each time you use it. Unlike `install.packages("")`, `library()` can be run in the code chunks in an Rmd file.
+
+**Answer:**
+
+```{r}
+library(usdata)
+head(usdata::county_2019, 6)
+```
+
+
+## Question 2 [20 points]
+
+Simulate 50 random numbers from a standard normal distribution and assign them to `x1`. Simulate another 50 random numbers from a standard uniform distribution and assign them to `x2`. Calculate the following quantities for each sequence:
+
+-   Sum
+-   Minimum
+-   Maximum
+-   Median
+
+Hint: You can use functions - `rnorm, runif, sum, min, max, median`
+
+**Answer:**
+
+```{r}
+x1<-rnorm(50)
+x2<-runif(50)
+head(x1)
+sum(x1)
+min(x1)
+max(x1)
+median(x1)
+
+head(x2)
+sum(x2)
+min(x2)
+max(x2)
+median(x2)
+
+```
+
+## Question 3 [20 points]
+
+Visually assess the normality of `x1` and `x2` in the previous question (e.g. plot histogram).
+
+**Answer:**
+
+```{r}
+
+qqnorm(x1, main = "Q-Q Plot of x1")
+hist(x1, main = "Histogram of x1")
+qqnorm(x2, main = "Q-Q Plot of x2")
+hist(x2, main = "Histogram of x2")
+```
+
+## Question 4 [20 points]
+
+Use the `seq` function to define a new variable, `z`, which contains 50 numbers between -5 and 5, and round these numbers to 3 decimal points. (hint: you can use functions - `seq, round`)
+
+**Answer:**
+
+```{r}
+z <- seq(-5,5,length=50)
+z <- round(z,3)
+z
+```
+
+## Question 5 [20 points]
+
+Create a scatterplot with `x1` on the horizontal axis and `z` on the vertical axis.
+
+**Answer:**
+
+```{r}
+plot(x1,z,main="scatterplot of x1 and z",
+     xlab="x1",ylab="z")
+```

@@ -1,0 +1,310 @@
+---
+title: "STAT 3675Q Homework 3"
+subtitle: "Due date: **Thursday, September 18, at noon**"
+output: pdf_document
+fontsize: 12pt
+urlcolor: blue
+author: "Zeshi Feng"
+---
+
+```{r setup, include=FALSE}
+# Some global options
+knitr::opts_chunk$set(include = TRUE) # print out all code  
+knitr::opts_chunk$set(echo = TRUE) # print out all output
+```
+
+**Note:**
+
+- Ensure that your code is fully visible in the PDF and not cropped. If needed, break the code into multiple lines to fit.
+
+- It is recommended to write descriptive answers outside of R code chunks (i.e., as text in the main body), while comments within the code chunks can be reserved for brief code annotations.
+
+- In all homework questions, include a written explanation of any output to earn full credit.
+
+
+## Question 1 [20 points]
+
+a.  Create vectors with the following names and elements. 
+
+- Subject: Math, Science, History, Music 
+- Midterm: $95, 87, 39, 67$
+- Final: $93, 90, 32, 88$
+- Grade: $A, B, c, B$
+
+**Answer:**
+```{r}
+Subject <- c("Math", "Science", "History", "Music")
+Midterm <- c(95, 87, 39, 67)
+Final   <- c(93, 90, 32, 88)
+Grade   <- c("A", "B", "C", "B")
+
+Subject
+Midterm
+Final
+Grade
+
+```
+
+
+b. Convert Grade to an ordered factor (ordinal variable) with levels C<B<A. Then create a data frame containing the four variables created in part a.
+
+**Answer:**
+```{r}
+Grade <- factor(c("A", "B", "C", "B"), 
+                levels = c("C", "B", "A"), 
+                ordered = TRUE)
+results <- data.frame(Subject, Midterm, Final, Grade)
+results
+```
+
+c. Suppose that the data above are grades of a student named Katty in 2022.  Create a list for Katty's grade as follows.
+
+```
+## $name
+## [1] "Katty"
+##
+## $year
+## [1] 2022
+##
+## $score
+## Subject Midterm Final Grade
+## 1 Math 95 93 A
+## 2 Science 87 90 B
+## 3 History 39 32 C
+## 4 Music 67 88 B
+```
+
+**Answer:**
+```{r}
+Katty_grade <- list(
+  name = "Katty",
+  year = 2022,
+  score = results
+)
+Katty_grade
+
+```
+
+d. What is Katty's History grade? Use the function `which()`.
+
+**Answer:**
+```{r}
+row_index <- which(Katty_grade$score$Subject == "History")
+Katty_grade$score$Grade[row_index]
+```
+"grade is C"
+
+## Question 2 [30 points]
+
+a. Create the following data frame:
+
+Cereal.name  | Manufacturer | Cold.or.Hot | calories | rating
+------------ | -------------|-------------|----------|-------
+100%_Bran | N | C | 70 | 68.4
+100%_Natural_Bran | Q | C | 120 | 34.0
+All-Bran | K | H | 70 | 59.4
+All-Bran_with_Extra_Fiber | K | C | 50 | 93.7
+Almond_Delight | R | H | 110 | 34.4
+Apple_Cinnamon_Cheerios | G | C | 110 | 29.5
+
+where `Manufacturer` and `Cold.or.Hot` should be created as factors, and `Cereal.name` should be used as the case identifier.
+
+```{r}
+# The following is given for your convenience
+Cereal.name	<- c("100%_Bran", "100%_Natural_Bran", "All-Bran",	
+                 "All-Bran_with_Extra_Fiber", "Almond_Delight",	
+                 "Apple_Cinnamon_Cheerios")
+Manufacturer <- c("N", "Q", "K", "K", "R", "G")
+Cold.or.Hot	<- c("C", "C", "H",	"C", "H", "C")
+calories <- c(70, 120, 70, 50, 110, 110)
+rating <- c(68.4, 34, 59.4, 93.7, 34.4, 29.5)
+```
+
+**Answer:**
+```{r}
+cereal_df <- data.frame(Manufacturer, Cold.or.Hot, calories, rating, row.names = Cereal.name)
+cereal_df
+```
+
+b.  Create an ordered factor named `grade` in the data frame, which takes the value "high" if `rating` is greater than 90, "low" if `rating` is less than 40, and "median" otherwise. The order of the levels should be low=1, median=2, high=3. 
+
+**Answer:**
+```{r}
+grade <- ifelse(cereal_df$rating > 90, "high",
+                ifelse(cereal_df$rating < 40, "low", "median"))
+grade <- factor(grade, 
+                levels = c("low", "median", "high"), 
+                ordered = TRUE)
+cereal_df$grade <- grade
+cereal_df
+
+```
+
+c. Extract the manufacturer and calories information of the all cereals with low grade.   
+
+**Answer:**
+```{r}
+low_grade_info <- cereal_df[cereal_df$grade == "low", 
+                            c("Manufacturer", "calories")]
+low_grade_info
+```
+
+d.  Create a table that displays the count of occurrences for each combination of manufacturer and grade.
+
+**Answer:**
+```{r}
+table_manuf_grade <- table(cereal_df$Manufacturer, cereal_df$grade)
+print(table_manuf_grade)
+```
+
+e. Create a list containing information about cold cereals. Include the following three components in the list:  `Cereal.name`, `Manufacturer`, and `rating`.
+
+**Answer:**
+```{r}
+cold_cereals <- cereal_df[cereal_df$Cold.or.Hot == "C", ]
+cold_list <- list(
+  Cereal.name = rownames(cold_cereals),
+  Manufacturer = cold_cereals$Manufacturer,
+  rating = cold_cereals$rating
+)
+cold_list
+```
+
+
+## Question 3 [50 points]
+
+**Data:** The Forbes Global 2000 list is a ranking of the world's biggest companies, measured by sales, profits, assets and market value (Year 2014).
+(http://www.forbes.com/global2000/list/#tab:overall)
+
+#### Here is a description of the columns in the data set
+* Company: the name of the company
+* Sector: a factor describing the products the company produces
+* Industry: a factor giving the industry the company belongs to
+* Continent: a factor giving the continent the company is situated in
+* Country: a factor giving the country the company is situated in
+* Market Value: the market value of the company in billion USD
+* Sales: the amount of sales of the company in billion USD
+* Profits: the profit of the company in billion USD
+* Assets: the assets of the company in billion USD
+* Rank: the ranking of the company
+* Forbes Webpage: a character string describing webpage whitin Forbes.com
+
+a. Use `read.csv()` to load the data set `Forbes Global 2000.csv` into R and store it as **ForbesGlobal2000**.
+
+**Answer:**
+```{r}
+ForbesGlobal2000 <- read.csv("Forbes Global 2000.csv")
+```
+
+b. Display the first and last few records in the data using the functions `head()` and `tail()`, respectively.
+
+**Answer:**
+```{r}
+head(ForbesGlobal2000)
+tail(ForbesGlobal2000)
+```
+
+c. Check the structure of **ForbesGlobal2000**.
+
+**Answer:**
+```{r}
+str(ForbesGlobal2000)
+```
+
+d. Convert the variables **Sector** and **Industry** to factors. 
+
+Hint: you need to change the data type in the data frame, so the command should be like "`data-frame-name$column-name <- `", and note that `attach()` cannot modify the data frame.
+
+Check if there are any empty levels for the two factors. If so, replace those empty levels with `"NA"`. Then check your results again. 
+
+Hint: use the function `levels()` and see the [link](http://stackoverflow.com/questions/11810605/replace-contents-of-factor-column-in-r-dataframe).
+
+**Answer:**
+```{r}
+ForbesGlobal2000$Sector   <- as.factor(ForbesGlobal2000$Sector)
+ForbesGlobal2000$Industry <- as.factor(ForbesGlobal2000$Industry)
+
+#To see if there is empty levels
+levels(ForbesGlobal2000$Sector)
+levels(ForbesGlobal2000$Industry)
+
+
+levels(ForbesGlobal2000$Sector)[levels(ForbesGlobal2000$Sector) == ""] <- "NA"
+levels(ForbesGlobal2000$Industry)[levels(ForbesGlobal2000$Industry) == ""] <- "NA"
+
+#check again
+levels(ForbesGlobal2000$Sector)
+levels(ForbesGlobal2000$Industry)
+
+
+```
+"We can see the empty levels are replaced by NA"
+
+
+e.  Convert the variables **Continent** and **Country** to factors and check the number of levels (hint: use the function `nlevels()`). 
+
+**Answer:**
+```{r}
+ForbesGlobal2000$Continent <- as.factor(ForbesGlobal2000$Continent)
+ForbesGlobal2000$Country   <- as.factor(ForbesGlobal2000$Country)
+nlevels(ForbesGlobal2000$Continent)
+nlevels(ForbesGlobal2000$Country)
+
+```
+"there are 6 Continent and 63 contries"
+
+f.  Sort the dataset by the continent and then by the country in alphabetical order. Print the first few observations of the sorted dataset.
+
+**Answer:**
+```{r}
+ForbesGlobal2000_sorted <- ForbesGlobal2000[order(ForbesGlobal2000$Continent,
+                                                  ForbesGlobal2000$Country), ]
+head(ForbesGlobal2000_sorted)
+```
+
+g.  Compute the mean and median of the profits of all companies from the first continent in part f.
+
+**Answer:**
+```{r}
+first_continent <- ForbesGlobal2000_sorted$Continent[1]
+subset_first <- subset(ForbesGlobal2000_sorted, Continent == first_continent)
+mean_profit   <- mean(subset_first$Profits, na.rm = TRUE)
+median_profit <- median(subset_first$Profits, na.rm = TRUE)
+
+mean_profit
+median_profit
+```
+
+h.  Create a subset of the dataset obtained in part f by excluding **Sales** and **Profits** and including only observations who are in the United States AND with **Assets** greater than 2000 billion USD. Print the first few observations of this dataset.
+
+**Answer:**
+```{r}
+subset_US <- subset(ForbesGlobal2000_sorted,
+                    Country == "United States" & Assets > 2000,
+                    select = -c(Sales, Profits))
+head(subset_US)
+```
+
+
+i.  Create another subset of the dataset obtained in part f by including only **Profits**, **Assets**, and **Country**, and only observations who have **Profits** greater than 30 billion USD OR **Assets** greater than 2000 billion USD.
+
+**Answer:**
+```{r}
+subset_big <- subset(ForbesGlobal2000_sorted,
+                     Profits > 30 | Assets > 2000,
+                     select = c(Profits, Assets, Country))
+head(subset_big)
+
+```
+
+
+j.  Set the random seed to 124, and then randomly select 10 companies from the sorted dataset from part f and display their names and websites. 
+
+**Answer:**
+```{r}
+set.seed(124)
+random_index <- sample(1:nrow(ForbesGlobal2000_sorted), 10)
+random_companies <- ForbesGlobal2000_sorted[random_index, c("Company", "Forbes.Webpage")]
+random_companies
+```
+
