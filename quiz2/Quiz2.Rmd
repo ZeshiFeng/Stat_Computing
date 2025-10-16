@@ -1,0 +1,81 @@
+---
+title: "Quiz 2"
+author: "Zeshi Feng"
+date: "2025-09-16"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+fontsize: 12pt
+urlcolor: blue
+---
+
+```{r setup, include=FALSE}
+# Some global options
+knitr::opts_chunk$set(include = TRUE) # print out all code  
+knitr::opts_chunk$set(echo = TRUE) # print out all output
+```
+
+**Data:** In a Washington Post article from October 6, 2015, titled ["Zero correlation between state homicide rate and state gun laws"](https://www.washingtonpost.com/news/volokh-conspiracy/wp/2015/10/06/zero-correlation-between-state-homicide-rate-and-state-gun-laws/), Eugene Volokh examined the relationship between the state total homicide rate and state gun laws.
+
+To do that, Volokh used the `**Brady score**', which represents how difficult it is to obtain a gun in a state. A low Brady score means a low level of gun restrictions (so it is easier to obtain a gun), and a high score means that it is harder to get a gun (i.e. there are stricter gun laws).
+
+The data set, available in the file `gun.csv`, contains the following variables:
+
+* Jurisdiction: State/jurisdiction name
+* Homicide rate: Number of **intentional** homicide death per 100,000 people
+* Gun accident rate: Number of gun accident death per 100,000 people
+* Brady score: The Brady score represents how difficult it is to obtain a gun in a state.
+* Brady grade: Another interpretation of Brady Score
+
+**Answer the following questions:**
+
+a. Load the data `gun.csv` into R and store it as **gunData**. Check the dimensions and structure of the dataset. Identify the data type of each variables.
+
+```{r}
+gunData <- read.csv("gun.csv")
+dim(gunData)
+str(gunData)
+```
+"The dataset has 51 rows and 5 columns, the data type are showing above"
+
+b. Add a logical variable **Homicide_index** to the data frame, takes the value TRUE if Homicide.rate is greater than 4.5, and FALSE otherwise. Verify the class of this variable is logical. Use the `table()` function to show the number of TRUE's and the number of FALSE's.
+
+```{r}
+gunData$Homicide_index <- gunData$Homicide.rate > 4.5
+class(gunData$Homicide_index)
+table(gunData$Homicide_index)
+```
+
+c. Add a new categorical variable  **bScoreCategory** to the data frame, which divides the Brady scores into two categories: high (H) if the Brady score is greater than 10, and low (L) if it is less than or equal to 10. Make sure the variable is a factor with two levels, "H" and "L". Display the summary statistics of the new variable. 
+
+```{r}
+gunData$bScoreCategory <- ifelse(gunData$Brady.score > 10, "H", "L")
+gunData$bScoreCategory <- factor(gunData$bScoreCategory, levels = c("H", "L"))
+class(gunData$bScoreCategory)
+```
+
+d. Add a new variable named **Sum** to the data frame gunData by calculating the sum of `Homicide.rate` and `Gun.accident.rate`.  Note that this variable represents the **total homicide rate**, i.e., total intentional homicide plus accidental gun death rates. 
+
+```{r}
+gunData$Sum <- gunData$Homicide.rate + gunData$Gun.accident.rate
+head(gunData[, c("Jurisdiction", "Homicide.rate", "Gun.accident.rate", "Sum")])
+```
+
+e. Identify the top 3 states with the highest total homicide rates and retrieve their corresponding Brady score, Homicide.rate, and Gun.accident.rate. (Hint: You may sort the total homicide rates for all states in descending order, and use the third-highest total homicide rate as a cutoff to extract the relevant rows.)
+
+```{r}
+sortedData <- gunData[order(-gunData$Sum), ]
+cutoff <- sortedData$Sum[3]
+topStates <- subset(gunData, Sum >= cutoff)
+topStates
+```
+
+f. Find all the states/jurisdictions which have weak restrictions for buying guns (Brady score < 0), and also have a low total homicide rate (< 4). Display the corresponding state/jurisdiction name, Brady score, and total homicide rate.
+
+```{r}
+weak_low <- subset(gunData, Brady.score < 0 & Sum < 4)
+weak_low[, c("Jurisdiction", "Brady.score", "Sum")]
+```
+
+

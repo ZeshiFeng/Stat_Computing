@@ -1,0 +1,6 @@
+Three, two, one, you are pinned
+Uncle right back in the pen
+Tell me how auntie been
+Three,|two,|one,|you|are|pinned
+Uncle|right|back|in|the|pen
+Tell|me|how|auntie|been

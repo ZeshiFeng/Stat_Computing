@@ -1,0 +1,71 @@
+---
+title: "Quiz 1"
+output:
+  pdf_document: default
+fontsize: 12pt
+date: "2025-09-04"
+author: Zeshi Feng
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+medMarketCap <- c(35.46, 58.81, 107.17, 130.79, 127.48,
+234.51, 330.08, 545.14, 428.32, 563.86,
+50.15, 86.38, 119.00, 112.62, 103.35,
+130.68, 145.69, 164.60, 239.14, 163.67)
+rnames <- c("Apple", "Google")
+cnames <- as.character(2005:2014)
+M <- matrix(medMarketCap, nrow=2, ncol=10, byrow=TRUE,
+dimnames=list(rnames, cnames))
+M
+
+```
+
+
+## Question 1
+Complete the exercise on page 24 of Lecture 2, Part 1 slides. You can copy the code for creating `M` from the slides.
+
+```{r}
+M[,3:6]
+M["Apple", "2014"]
+```
+
+
+## Question 2
+Print out all positive elements of `xmat`.
+
+```{r}
+set.seed(1)
+xmat <- matrix(rnorm(20), nrow=4)
+xmat[xmat>0]
+```
+
+
+## Question 3
+The data frame `mtcars`,  which comes with the basic installation of `R`, contains the Motor Trend Car Road Tests data extracted from the 1974 Motor Trend US magazine. 
+
+a. Use an R command to find out the structure of the data frame.
+
+```{r}
+mtcars$mpg
+str(mtcars)
+```
+
+b. In this dataset, the variable `wt` is Weight (lb/1000) of the automobile, and the variable `mpg` is the Miles/(US) gallon. Draw a scatter plot of `wt` vs. `mpg`, using the `attach()` function. Detach the data after using it.
+
+```{r}
+attach(mtcars)
+plot(mpg,wt)
+detach(mtcars)
+
+```
+
+c. Suppose you run the command `wt <- c(2.5, 3.6, 4.7)` before running the commands in part b. What will happen? Why?
+
+```{r}
+wt <- c(2.5, 3.6, 4.7)
+```
+Since we have 'wt' in global environment when we run the code above. Therefore the plot function would fail because the length of array 'wt' do not match the 'mpg' length.
+
+
+

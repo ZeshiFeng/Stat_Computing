@@ -1,0 +1,81 @@
+---
+title: "Quiz 3"
+output: pdf_document
+fontsize: 12pt
+urlcolor: blue
+date: "2025-10-07"
+author: Zeshi Feng
+---
+
+```{r setup, include=FALSE}
+# Some global options
+knitr::opts_chunk$set(include = TRUE) # print out all code  
+knitr::opts_chunk$set(echo = TRUE) # print out all output
+```
+
+## Question 1
+
+a. Use the `cat()` function in R to write two lines of lyrics from your favorite song into a text file named "lyrics.txt"
+
+```{r}
+cat("Three, two, one, you are pinned\nUncle right back in the pen\nTell me how auntie been\n",
+    file = "lyrics.txt")
+```
+
+b. Use `readLines()` to read the contents of "lyrics.txt" into R
+
+```{r}
+lyrics <- readLines("lyrics.txt")
+lyrics
+```
+
+c. Use an appropriate function to find all white spaces in each line
+
+```{r}
+spaces <- gregexpr("\\s", lyrics)
+spaces
+```
+
+d. Replace all white spaces with the character "|"
+
+```{r}
+lyrics_pipe <- gsub("\\s", "|", lyrics)
+lyrics_pipe
+```
+
+e. Write both the original and modified lines (a total of four lines) back into the same text file
+
+```{r}
+combined <- c(lyrics, lyrics_pipe)
+writeLines(combined, "lyrics.txt")
+```
+
+## Question 2 (Using the `apply` family with user-written functions)
+
+a. Explain what the following code does, and what `out` contains:
+
+```{r echo=TRUE, include=TRUE, results = "hide"}
+set.seed(1234) # Sets the random number seed, ensures reproducibility of results.
+mu <- c(-2,-1,0,1,2)# Creates a numeric vector of 5 mean values
+out <- lapply(mu, function(x) rnorm(100, mean=x))# Generate 5 samples, each 100 N(x,1)
+```
+
+
+b. Get the 30\% and 70\% quantiles of each sample contained in `out` using only one line of code.
+
+```{r}
+sapply(out, quantile, probs = c(0.3, 0.7))
+```
+
+
+## Question 3
+
+Get the 30\% and 70\% quantiles of each column of the `airquality` data. Notice that there are `NA`s in `Ozone` and `Solar.R`:
+
+```{r echo=TRUE, include=TRUE}
+summary(airquality)
+```
+
+```{r}
+sapply(airquality, quantile, probs = c(0.3, 0.7), na.rm = TRUE)
+```
